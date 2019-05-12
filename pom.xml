@@ -10,12 +10,21 @@
     <modules>
         <module>tensquare_common</module>
         <module>tensquare_base</module>
+        <module>tensquare_recurit</module>
+        <module>tensquare_qa</module>
+        <module>tensquare_article</module>
+        <module>tensquare_gathering</module>
+        <module>tensquare_spit</module>
+        <module>tensquare_search</module>
+        <module>tensquare_rabbitmq_test</module>
+        <module>tensquare_user</module>
+        <module>tensquare_sms</module>
     </modules>
 
     <!--打包方式-->
     <packaging>pom</packaging>
     <name>tensquare_parent</name>
-    <description>十次方项目-TONG</description>
+    <description>十次方项目-TONGTONG</description>
     <!--springboot基础依赖-->
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -46,12 +55,17 @@
             <artifactId>lombok</artifactId>
             <version>1.16.20</version>
         </dependency>
+        <!--试试热部署-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
     </dependencies>
     <!--仓库-->
     <repositories>
         <repository>
             <id>spring-snapshots</id>
-            <name>Spring Snapshots</name>
+            <name>Spring Snapshots</name>
             <url>https://repo.spring.io/snapshot</url>
             <snapshots>
                 <enabled>true</enabled>

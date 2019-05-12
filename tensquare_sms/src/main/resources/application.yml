@@ -1,0 +1,13 @@
+server:
+  port: 9008
+spring:
+  application:
+    name: tensquare_sms
+  rabbitmq:
+    host: 47.94.151.130
+aliyun:
+  sms:
+    accessKeyId: LTAIlqay85B6Hv0s
+    accessKeySecret: Uxa16fkdMcDcTjTmxMZb6CvwlvrEx5
+    sign_name: jhn_sms #为啥名字这么吊，我也没办法。。。
+    template_code: SMS_165117291

@@ -1,5 +1,6 @@
 package entity;
 
+import jdk.net.SocketFlow;
 import lombok.Data;
 
 /**
@@ -16,6 +17,14 @@ public class Result {
     private Object data;
 
     public Result() {
+    }
+
+    public  Result(String message) {
+        this(true, StatusCode.OK, message);
+    }
+
+    public Result(String message, Object data) {
+        this(true, StatusCode.OK, message, data);
     }
 
     public Result(boolean flag, Integer code, String message) {

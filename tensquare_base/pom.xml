@@ -12,6 +12,7 @@
     <artifactId>tensquare_base</artifactId>
 
     <name>tensquare_base</name>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
