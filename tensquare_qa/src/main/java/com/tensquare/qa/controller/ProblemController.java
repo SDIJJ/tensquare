@@ -3,6 +3,7 @@ package com.tensquare.qa.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.tensquare.qa.client.BaseClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import com.tensquare.qa.service.ProblemService;
 import entity.PageResult;
 import entity.Result;
 import entity.StatusCode;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 控制器层
@@ -26,6 +29,18 @@ public class ProblemController {
 
     @Autowired
     private ProblemService problemService;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private BaseClient baseClient;
+
+    @GetMapping("/label/{labelId}")
+    public Result findLabelById(@PathVariable String labelId) {
+        return baseClient.findById(labelId);
+    }
+
 
     @GetMapping("/newlist/{label}/{page}/{size}")
     public Result newlist(@PathVariable String label, @PathVariable int page, @PathVariable int size) {
@@ -100,6 +115,10 @@ public class ProblemController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public Result add(@RequestBody Problem problem) {
+        Object user_claims = request.getAttribute("user_claims");
+        if (user_claims == null) {
+            return new Result(false, StatusCode.LOGINERROR, "权限不足！");
+        }
         problemService.add(problem);
         return new Result(true, StatusCode.OK, "增加成功");
     }
@@ -112,6 +131,10 @@ public class ProblemController {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public Result update(@RequestBody Problem problem, @PathVariable String id) {
         problem.setId(id);
+        Object user_claims = request.getAttribute("user_claims");
+        if (user_claims == null) {
+            return new Result(false, StatusCode.LOGINERROR, "权限不足！");
+        }
         problemService.update(problem);
         return new Result(true, StatusCode.OK, "修改成功");
     }
@@ -124,6 +147,10 @@ public class ProblemController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public Result delete(@PathVariable String id) {
         problemService.deleteById(id);
+        Object user_claims = request.getAttribute("user_claims");
+        if (user_claims == null) {
+            return new Result(false, StatusCode.LOGINERROR, "权限不足！");
+        }
         return new Result(true, StatusCode.OK, "删除成功");
     }
 

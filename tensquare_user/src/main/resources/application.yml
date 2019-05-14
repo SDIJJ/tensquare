@@ -15,3 +15,14 @@ spring:
     host: 47.94.151.130
   rabbitmq:
     host: 47.94.151.130
+jwt:
+  config:
+    key: tongtong
+    ttl: 3600000   #过期时间,毫秒
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:6868/eureka
+  instance:
+    prefer-ip-address: true  #模块之间跨域访问
+

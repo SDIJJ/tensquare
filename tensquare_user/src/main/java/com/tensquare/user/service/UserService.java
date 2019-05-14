@@ -9,8 +9,14 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.spi.http.HttpContext;
 
+import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpRequest;
+import org.aspectj.weaver.bcel.BcelAccessForInlineMunger;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,12 +24,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.HttpRequestHandler;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 import util.IdWorker;
 
 import com.tensquare.user.dao.UserDao;
 import com.tensquare.user.pojo.User;
+import util.JwtUtil;
 
 /**
  * 服务层
@@ -31,6 +44,7 @@ import com.tensquare.user.pojo.User;
  * @author Administrator
  */
 @Service
+@Transactional
 public class UserService {
 
     @Autowired
@@ -44,6 +58,27 @@ public class UserService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private HttpServletRequest request;
+
+
+    /**
+     * 用户登陆
+     *
+     * @param user
+     * @return
+     */
+    public User login(User user) {
+        User login = userDao.findUserByMobile(user.getMobile());
+        return null != login && bCryptPasswordEncoder.matches(user.getPassword(), login.getPassword()) ? login : null;
+    }
 
     /**
      * 查询全部列表
@@ -103,6 +138,7 @@ public class UserService {
         user.setRegdate(new Date());//注册日期
         user.setUpdatedate(new Date());//更新日期
         user.setLastdate(new Date());//后登陆日期
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userDao.save(user);
     }
 
@@ -121,6 +157,11 @@ public class UserService {
      * @param id
      */
     public void deleteById(String id) {
+//        ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+        Object admin_claims = request.getAttribute("admin_claims");
+        if (admin_claims == null) {
+            throw new RuntimeException("权限不足！！！");
+        }
         userDao.deleteById(id);
     }
 
@@ -198,5 +239,11 @@ public class UserService {
         rabbitTemplate.convertAndSend("sms", map);
         //3.打印
         System.out.println("验证码： " + checkcode);
+    }
+
+
+    public void updateFanscountAndFollowcount(String userId, String friendId, int count) {
+        userDao.updateFanscount(count, friendId);
+        userDao.updateFollowcount(count, userId);
     }
 }

@@ -9,5 +9,5 @@ aliyun:
   sms:
     accessKeyId: LTAIlqay85B6Hv0s
     accessKeySecret: Uxa16fkdMcDcTjTmxMZb6CvwlvrEx5
-    sign_name: jhn_sms #为啥名字这么吊，我也没办法。。。
+    sign_name: 十次方项目短信验证码
     template_code: SMS_165117291

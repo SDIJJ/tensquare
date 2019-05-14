@@ -1,5 +1,6 @@
 package com.tensquare.sms.listener;
 
+import ch.qos.logback.classic.Logger;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.tensquare.sms.util.SmsUtil;
@@ -27,6 +28,11 @@ public class SmsListener {
         String checkcode = map.get("checkcode");
         System.out.println("手机号： " + mobile);
         System.out.println("验证码： " + checkcode);
-        SendSmsResponse sendSmsResponse = smsUtil.sendSms(mobile, checkcode);
+        SendSmsResponse sendSmsResponse = smsUtil.sendSms(mobile,"{\"checkcode\": \""+checkcode+"\"}" );
+        if (sendSmsResponse.getCode().equalsIgnoreCase("OK")) {
+            System.out.println("发送成功！！！！");
+        }else{
+            System.out.println(mobile+": 验证码发送失败！！");
+        }
     }
 }

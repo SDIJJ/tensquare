@@ -19,6 +19,9 @@
         <module>tensquare_rabbitmq_test</module>
         <module>tensquare_user</module>
         <module>tensquare_sms</module>
+        <module>tensquare_eureka</module>
+        <module>tensquare_friend</module>
+        <module>tensquare_manager</module>
     </modules>
 
     <!--打包方式-->
@@ -32,6 +35,17 @@
         <version>2.0.1.RELEASE</version>
         <relativePath/>
     </parent>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Finchley.M9</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <!--配置参数-->
     <properties>
         <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>

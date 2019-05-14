@@ -1,12 +1,16 @@
 package com.tensquare.user.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import ch.qos.logback.core.pattern.util.RestrictedEscapeUtil;
+import com.tensquare.user.pojo.Admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.parameters.P;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +20,7 @@ import com.tensquare.user.service.UserService;
 import entity.PageResult;
 import entity.Result;
 import entity.StatusCode;
+import util.JwtUtil;
 
 /**
  * 控制器层
@@ -33,6 +38,29 @@ public class UserController {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @PutMapping("/update/{userId}/{friendId}/{count}")
+    public void updateFanscountAndFollowcount(@PathVariable String userId, @PathVariable String friendId,
+                                              @PathVariable int count){
+        userService.updateFanscountAndFollowcount(userId,friendId,count);
+    }
+
+    @PostMapping("/login")
+    public Result login(@RequestBody User user) {
+        User login = userService.login(user);
+        if (login == null)
+            return new Result(false, StatusCode.LOGINERROR, "登陆失败");
+        String token = jwtUtil.createJWT(login.getId(), login.getMobile(), "user");
+        Map<String,String> map=new HashMap<>();
+        map.put("name",login.getNickname());
+        map.put("token",token);
+        map.put("role","user");
+
+        return new Result("登陆成功",map);
+    }
+
     /**
      * 用户注册
      *
@@ -43,10 +71,10 @@ public class UserController {
     public Result register(@PathVariable String code, @RequestBody User user) {
         String checkcode = (String) redisTemplate.opsForValue().get("checkcode_" + user.getMobile());
         if (StringUtils.isEmpty(checkcode)) {
-          return   new Result(false, StatusCode.ERROR, "请先获取验证码");
+            return new Result(false, StatusCode.ERROR, "请先获取验证码");
         }
         if (!checkcode.equals(code)) {
-          return   new Result(false, StatusCode.ERROR, "验证码错误");
+            return new Result(false, StatusCode.ERROR, "验证码错误");
         }
         userService.add(user);
         return new Result("注册成功");

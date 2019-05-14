@@ -17,6 +17,9 @@ import com.tensquare.qa.service.ReplyService;
 import entity.PageResult;
 import entity.Result;
 import entity.StatusCode;
+
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 控制器层
  * @author Administrator
@@ -29,6 +32,9 @@ public class ReplyController {
 
 	@Autowired
 	private ReplyService replyService;
+
+	@Autowired
+	private HttpServletRequest request;
 	
 	
 	/**
@@ -80,6 +86,10 @@ public class ReplyController {
 	 */
 	@RequestMapping(method=RequestMethod.POST)
 	public Result add(@RequestBody Reply reply  ){
+		Object user_claims = request.getAttribute("user_claims");
+		if (user_claims == null) {
+			return new Result(false, StatusCode.LOGINERROR, "权限不足！");
+		}
 		replyService.add(reply);
 		return new Result(true,StatusCode.OK,"增加成功");
 	}
@@ -91,7 +101,11 @@ public class ReplyController {
 	@RequestMapping(value="/{id}",method= RequestMethod.PUT)
 	public Result update(@RequestBody Reply reply, @PathVariable String id ){
 		reply.setId(id);
-		replyService.update(reply);		
+		Object user_claims = request.getAttribute("user_claims");
+		if (user_claims == null) {
+			return new Result(false, StatusCode.LOGINERROR, "权限不足！");
+		}
+		replyService.update(reply);
 		return new Result(true,StatusCode.OK,"修改成功");
 	}
 	
@@ -102,6 +116,10 @@ public class ReplyController {
 	@RequestMapping(value="/{id}",method= RequestMethod.DELETE)
 	public Result delete(@PathVariable String id ){
 		replyService.deleteById(id);
+		Object user_claims = request.getAttribute("user_claims");
+		if (user_claims == null) {
+			return new Result(false, StatusCode.LOGINERROR, "权限不足！");
+		}
 		return new Result(true,StatusCode.OK,"删除成功");
 	}
 	
